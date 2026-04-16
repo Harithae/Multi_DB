@@ -5,6 +5,22 @@ from datetime import datetime, timezone, timedelta
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Realistic product names
+PRODUCT_NAMES = [
+    "Wireless Bluetooth Headphones", "USB-C Charging Cable", "Portable Power Bank", "Smartphone Case",
+    "Tempered Glass Screen Protector", "Wireless Mouse", "Mechanical Keyboard", "USB Hub 3.0",
+    "Laptop Stand", "Phone Ring Holder", "Screen Cleaner Kit", "Cable Organizer",
+    "Webcam HD", "Microphone USB", "Portable SSD 1TB", "HDMI Cable 2.1",
+    "Monitor Arm Stand", "Anti-Blue Light Glasses", "Desk Lamp LED", "USB Foot Pedal",
+    "Noise-Cancelling Earbuds", "Wireless Charging Pad", "External Hard Drive 2TB", "Car Phone Mount",
+    "Desk Organizer", "Keyboard Wrist Rest", "Monitor Light Bar", "Desk Pad Mat",
+    "USB Splitter Hub", "Phone Stand Dock", "Wire Manager Clips", "Magnetic Cable Holder"
+]
+
+COLORS = ["Black", "White", "Silver", "Gold", "Blue", "Red", "Gray", "Rose Gold"]
+SIZES = ["XS", "S", "M", "L", "XL", "XXL", "One Size", "Free Size"]
+WEIGHTS = ["100g", "250g", "500g", "1kg", "1.5kg", "2kg", "2.5kg", "3kg"]
+
 import pyodbc
 from config.db_config import Config
 
@@ -75,7 +91,8 @@ def bulk_insert_inventory(count=1000):
         product_ids = []
         for i in range(1, count + 1):
             cat_id = random.choice(category_ids)
-            prod_data = (f"Product {i}", f"Full description for Product {i} with some extra long text to test VARCHAR(MAX) capabilities. Lorem ipsum dolor sit amet, consectetur adipiscing elit.", cat_id, now)
+            product_name = random.choice(PRODUCT_NAMES)
+            prod_data = (product_name, f"High-quality {product_name.lower()} with excellent features and durability. Perfect for both professional and personal use.", cat_id, now)
             cur.execute("INSERT INTO Product (Product_Name, Product_Description, Product_Category_ID, Created_Date) OUTPUT INSERTED.Product_ID VALUES (?,?,?,?)", prod_data)
             product_ids.append(cur.fetchone()[0])
 
@@ -83,9 +100,18 @@ def bulk_insert_inventory(count=1000):
         print("Inserting features...")
         feature_data = []
         for p_id in product_ids:
-            for feat in ["Color", "Size", "Weight"]:
-                val = random.choice(["Red", "Blue", "Small", "Large", "1kg", "500g"])
-                feature_data.append((p_id, feat, val, now))
+            # Color feature
+            color_val = random.choice(COLORS)
+            feature_data.append((p_id, "Color", color_val, now))
+            
+            # Size feature
+            size_val = random.choice(SIZES)
+            feature_data.append((p_id, "Size", size_val, now))
+            
+            # Weight feature
+            weight_val = random.choice(WEIGHTS)
+            feature_data.append((p_id, "Weight", weight_val, now))
+        
         cur.executemany("INSERT INTO Product_Features (Product_ID, Product_Feature_Name, Product_Feature_Value, Created_Date) VALUES (?,?,?,?)", feature_data)
 
         # 7. Insert Images (1 per product)
