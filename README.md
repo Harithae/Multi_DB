@@ -100,5 +100,9 @@ python main.py
 
 ## 📝 Technical Notes
 - **Relational Integrity**: Even though data is spread across SQL and NoSQL systems, the scripts ensure `Customer_ID` and `Product_ID` remain consistent across systems.
+- **Cross-Database Relations**: 
+  - Orders reference Products via `Product_ID` in Order_Items table
+  - Store details for ordered products are retrieved via SQL Server's `Store_Products` table
+  - Query example: `SELECT o.Order_ID, oi.Product_ID, sp.Store_ID FROM Order o JOIN Order_Items oi ON o.Order_ID = oi.Order_ID JOIN [SQL_Server].[InventoryDB].dbo.Store_Products sp ON oi.Product_ID = sp.Product_ID`
 - **Transactions**: Bulk insertions use transactions (where supported) to ensure data consistency.
 - **Decimal Precision**: Financial fields (prices/amounts) use `Decimal128` in MongoDB and `DECIMAL(10,2)` in SQL systems for accuracy.

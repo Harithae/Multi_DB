@@ -44,13 +44,20 @@ def get_sqlserver_data():
         conn_str += f"UID={Config.SQLSERVER_USER};PWD={Config.SQLSERVER_PASSWORD};"
     conn_str += "TrustServerCertificate=yes;"
     
-    print("Fetching products from SQL Server...")
+    print("Fetching store-product mapping from SQL Server...")
     conn = pyodbc.connect(conn_str)
     cur = conn.cursor()
+    
+    # Fetch Store_Products (Store_ID, Product_ID with actual stock)
+    cur.execute("SELECT Store_ID, Product_ID, Stock_Quantity FROM Store_Products WHERE Stock_Quantity > 0")
+    store_products = [{"Store_ID": row[0], "Product_ID": row[1], "Stock": row[2]} for row in cur.fetchall()]
+    
+    # Also fetch all products for fallback
     cur.execute("SELECT Product_ID FROM Product")
-    products = [row[0] for row in cur.fetchall()]
+    all_products = [row[0] for row in cur.fetchall()]
+    
     conn.close()
-    return products
+    return store_products, all_products
 
 def get_pg_conn():
     return psycopg2.connect(
@@ -64,10 +71,10 @@ def get_pg_conn():
 def bulk_insert_sales():
     # 1. Fetch cross-DB data
     customers, cust_addr_map = get_mongo_data()
-    products = get_sqlserver_data()
+    store_products, all_products = get_sqlserver_data()
     
-    if not customers or not products:
-        print("Error: No customers or products found. Please run individual setup/bulk scripts first.")
+    if not customers or not store_products:
+        print("Error: No customers or store-product mappings found. Please run individual setup/bulk scripts first.")
         return
 
     # 2. Connect to PG
@@ -86,7 +93,7 @@ def bulk_insert_sales():
     all_invoices = []
     all_shipments = []
 
-    print(f"Generating orders for {len(customers)} customers...")
+    print(f"Generating orders for {len(customers)} customers using actual store-product inventory...")
     
     for cust in customers:
         cid = cust["Customer_ID"]
@@ -98,18 +105,21 @@ def bulk_insert_sales():
             order_date = now_utc - timedelta(days=random.randint(1, 60))
             aid = random.choice(addr_ids)
             
-            # Temporary state to calculate amount
+            # Temporary state to calculate amount and select valid store-products
             items_for_order = []
             order_amount = 0
             num_items = random.randint(1, 5)
-            for _ in range(num_items):
-                p_id = random.choice(products)
+            
+            # Select random store-product combinations
+            selected_items = random.sample(store_products, min(num_items, len(store_products)))
+            
+            for item in selected_items:
                 qty = random.randint(1, 3)
                 price = round(random.uniform(20.0, 500.0), 2)
                 item_total = price * qty
                 order_amount += item_total
                 items_for_order.append({
-                    "Product_ID": p_id,
+                    "Product_ID": item["Product_ID"],
                     "Quantity": qty,
                     "Price": price
                 })
@@ -121,7 +131,7 @@ def bulk_insert_sales():
             )
             order_id = cur.fetchone()[0]
             
-            # Step 2: Prepare Items
+            # Step 2: Prepare Items (Product_ID maps to stores via Store_Products)
             for item in items_for_order:
                 cur.execute(
                     'INSERT INTO Order_Items (Order_ID, Product_ID, Quantity, Price, Created_Date) VALUES (%s, %s, %s, %s, %s)',
@@ -154,7 +164,8 @@ def bulk_insert_sales():
     conn.commit()
     conn.close()
     print("\n[SUCCESS] Bulk insertion of Sales system (PostgreSQL) completed!")
-    print(f"  Processed ~{len(customers) * 7.5:.0f} orders with related items, payments, invoices, and shipments.")
+    print(f"  Processed ~{len(customers) * 7.5:.0f} orders with valid products from Store_Products inventory.")
+    print(f"  Product-Store mapping available via Product_ID in Order_Items → Store_Products in SQL Server.")
 
 if __name__ == "__main__":
     bulk_insert_sales()
