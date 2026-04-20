@@ -98,6 +98,7 @@ def create_tables():
         CREATE TABLE Product (
             Product_ID              INT IDENTITY(1,1) PRIMARY KEY,
             Product_Name            VARCHAR(1000)  NOT NULL,
+            product_price           DECIMAL(10,2)  NOT NULL,
             Product_Description     VARCHAR(MAX)   NOT NULL,
             Product_Category_ID     INT            NOT NULL
                 REFERENCES Product_Category(Product_Category_ID),
