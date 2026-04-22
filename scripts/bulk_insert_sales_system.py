@@ -121,7 +121,7 @@ def bulk_insert_sales():
                 items_for_order.append({
                     "Product_ID": item["Product_ID"],
                     "Quantity": qty,
-                    "Price": price
+                    "Price": item_total
                 })
             
             # Step 1: Insert Order and get ID
