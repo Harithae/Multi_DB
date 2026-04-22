@@ -106,6 +106,14 @@ def create_tables():
             Modified_Date           DATETIME       NULL
         )
     """)
+    
+    # Add Product_Price column if it doesn't exist
+    cur.execute("""
+        IF NOT EXISTS (SELECT * FROM sys.columns 
+                       WHERE object_id = OBJECT_ID(N'Product') 
+                       AND name = 'Product_Price')
+        ALTER TABLE Product ADD Product_Price DECIMAL(10,2) NOT NULL DEFAULT 0.00
+    """)
     print("Table 'Product' created.")
 
     # 4. Product_Image (FK → Product); BYTE → VARBINARY(MAX)
