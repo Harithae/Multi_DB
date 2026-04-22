@@ -44,7 +44,7 @@ def get_sqlserver_data():
         conn_str += f"UID={Config.SQLSERVER_USER};PWD={Config.SQLSERVER_PASSWORD};"
     conn_str += "TrustServerCertificate=yes;"
     
-    print("Fetching store-product mapping from SQL Server...")
+    print("Fetching store-product mapping and prices from SQL Server...")
     conn = pyodbc.connect(conn_str)
     cur = conn.cursor()
     
@@ -52,12 +52,12 @@ def get_sqlserver_data():
     cur.execute("SELECT Store_ID, Product_ID, Stock_Quantity FROM Store_Products WHERE Stock_Quantity > 0")
     store_products = [{"Store_ID": row[0], "Product_ID": row[1], "Stock": row[2]} for row in cur.fetchall()]
     
-    # Also fetch all products for fallback
-    cur.execute("SELECT Product_ID FROM Product")
-    all_products = [row[0] for row in cur.fetchall()]
-    
+    # Fetch product prices
+    cur.execute("SELECT Product_ID, Product_Price FROM Product")
+    product_price_map = {row[0]: float(row[1]) for row in cur.fetchall()}
+
     conn.close()
-    return store_products, all_products
+    return store_products, product_price_map
 
 def get_pg_conn():
     return psycopg2.connect(
@@ -71,7 +71,7 @@ def get_pg_conn():
 def bulk_insert_sales():
     # 1. Fetch cross-DB data
     customers, cust_addr_map = get_mongo_data()
-    store_products, all_products = get_sqlserver_data()
+    store_products, product_price_map = get_sqlserver_data()
     
     if not customers or not store_products:
         print("Error: No customers or store-product mappings found. Please run individual setup/bulk scripts first.")
@@ -115,7 +115,7 @@ def bulk_insert_sales():
             
             for item in selected_items:
                 qty = random.randint(1, 3)
-                price = round(random.uniform(20.0, 500.0), 2)
+                price = product_price_map.get(item["Product_ID"], round(random.uniform(199.0, 15999.0), 2))
                 item_total = price * qty
                 order_amount += item_total
                 items_for_order.append({
