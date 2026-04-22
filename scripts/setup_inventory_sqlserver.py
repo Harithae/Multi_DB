@@ -93,6 +93,39 @@ def create_tables():
     print("Table 'Locality' created.")
 
     # 3. Product (FK → Product_Category)
+    # Check if Product_Price column exists in the correct position
+    cur.execute("""
+        IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'Product') AND type='U')
+        BEGIN
+            -- Check if Product_Price exists but in wrong position (not right after Product_Name)
+            IF EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'Product') AND name = 'Product_Price')
+            BEGIN
+                -- Get column position
+                DECLARE @col_position INT
+                SELECT @col_position = column_id FROM sys.columns 
+                WHERE object_id = OBJECT_ID(N'Product') AND name = 'Product_Price'
+                
+                -- If Product_Price is not in position 3 (after Product_ID and Product_Name), recreate table
+                IF @col_position != 3
+                BEGIN
+                    -- Drop dependent tables first
+                    DROP TABLE IF EXISTS Store_Products
+                    DROP TABLE IF EXISTS Product_Features
+                    DROP TABLE IF EXISTS Product_Image
+                    DROP TABLE IF EXISTS Product
+                END
+            END
+            ELSE
+            BEGIN
+                -- Product_Price doesn't exist, need to recreate table
+                DROP TABLE IF EXISTS Store_Products
+                DROP TABLE IF EXISTS Product_Features
+                DROP TABLE IF EXISTS Product_Image
+                DROP TABLE IF EXISTS Product
+            END
+        END
+    """)
+    
     cur.execute("""
         IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'Product') AND type='U')
         CREATE TABLE Product (
@@ -105,14 +138,6 @@ def create_tables():
             Created_Date            DATETIME       NOT NULL DEFAULT GETDATE(),
             Modified_Date           DATETIME       NULL
         )
-    """)
-    
-    # Add Product_Price column if it doesn't exist
-    cur.execute("""
-        IF NOT EXISTS (SELECT * FROM sys.columns 
-                       WHERE object_id = OBJECT_ID(N'Product') 
-                       AND name = 'Product_Price')
-        ALTER TABLE Product ADD Product_Price DECIMAL(10,2) NOT NULL DEFAULT 0.00
     """)
     print("Table 'Product' created.")
 

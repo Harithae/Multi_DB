@@ -197,8 +197,10 @@ def bulk_insert_inventory(count=1000):
         for i in range(1, count + 1):
             cat_id = random.choice(category_ids)
             product_name = random.choice(PRODUCT_NAMES)
-            prod_data = (product_name, f"High-quality {product_name.lower()} with excellent features and durability. Perfect for both professional and personal use.", cat_id, now)
-            cur.execute("INSERT INTO Product (Product_Name, Product_Description, Product_Category_ID, Created_Date) OUTPUT INSERTED.Product_ID VALUES (?,?,?,?)", prod_data)
+            # Generate realistic price between ₹199 and ₹15,999
+            product_price = round(random.uniform(199.00, 15999.00), 2)
+            prod_data = (product_name, product_price, f"High-quality {product_name.lower()} with excellent features and durability. Perfect for both professional and personal use.", cat_id, now)
+            cur.execute("INSERT INTO Product (Product_Name, Product_Price, Product_Description, Product_Category_ID, Created_Date) OUTPUT INSERTED.Product_ID VALUES (?,?,?,?,?)", prod_data)
             product_ids.append(cur.fetchone()[0])
 
         # 6. Insert Features (3 per product)
