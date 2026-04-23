@@ -85,69 +85,69 @@ def bulk_insert_inventory(count=1000):
             cur.execute("INSERT INTO Product_Category (Product_Category_Name, Target_Gender, Target_Age_Group_From, Target_Age_Group_To, Created_Date) OUTPUT INSERTED.Product_Category_ID VALUES (?,?,?,?,?)", cat)
             category_ids.append(cur.fetchone()[0])
 
-        # 3. Insert Localities (Real Indian Cities and Areas)
+        # 3. Insert Localities (US Cities and Neighborhoods)
         print("Inserting localities...")
         localities_data = [
-            # Bangalore
-            ("Whitefield", "Bangalore", "Karnataka", "India", "560066", now),
-            ("Koramangala", "Bangalore", "Karnataka", "India", "560034", now),
-            ("Indiranagar", "Bangalore", "Karnataka", "India", "560038", now),
-            ("MG Road", "Bangalore", "Karnataka", "India", "560001", now),
-            ("Marathahalli", "Bangalore", "Karnataka", "India", "560037", now),
-            # Mumbai
-            ("Bandra", "Mumbai", "Maharashtra", "India", "400050", now),
-            ("Andheri", "Mumbai", "Maharashtra", "India", "400053", now),
-            ("Powai", "Mumbai", "Maharashtra", "India", "400076", now),
-            ("Fort", "Mumbai", "Maharashtra", "India", "400001", now),
-            ("Thane", "Mumbai", "Maharashtra", "India", "400601", now),
-            # Delhi
-            ("Connaught Place", "Delhi", "Delhi", "India", "110001", now),
-            ("Noida", "Delhi NCR", "Uttar Pradesh", "India", "201301", now),
-            ("Gurgaon", "Delhi NCR", "Haryana", "India", "122001", now),
-            ("Dwarka", "Delhi", "Delhi", "India", "110075", now),
-            ("South Delhi", "Delhi", "Delhi", "India", "110024", now),
-            # Hyderabad
-            ("HITEC City", "Hyderabad", "Telangana", "India", "500081", now),
-            ("Banjara Hills", "Hyderabad", "Telangana", "India", "500034", now),
-            ("Madhapur", "Hyderabad", "Telangana", "India", "500081", now),
-            ("Jubilee Hills", "Hyderabad", "Telangana", "India", "500033", now),
-            ("Secunderabad", "Hyderabad", "Telangana", "India", "500003", now),
-            # Pune
-            ("Hinjewadi", "Pune", "Maharashtra", "India", "411057", now),
-            ("Viman Nagar", "Pune", "Maharashtra", "India", "411014", now),
-            ("Kalyani Nagar", "Pune", "Maharashtra", "India", "411006", now),
-            ("Camp", "Pune", "Maharashtra", "India", "411001", now),
-            ("Kharadi", "Pune", "Maharashtra", "India", "411014", now),
-            # Chennai
-            ("T. Nagar", "Chennai", "Tamil Nadu", "India", "600017", now),
-            ("Anna Nagar", "Chennai", "Tamil Nadu", "India", "600040", now),
-            ("Adyar", "Chennai", "Tamil Nadu", "India", "600020", now),
-            ("Mylapore", "Chennai", "Tamil Nadu", "India", "600004", now),
-            ("Nungambakkam", "Chennai", "Tamil Nadu", "India", "600034", now),
-            # Kolkata
-            ("Salt Lake", "Kolkata", "West Bengal", "India", "700064", now),
-            ("Ballygunge", "Kolkata", "West Bengal", "India", "700019", now),
-            ("AJC Bose Road", "Kolkata", "West Bengal", "India", "700014", now),
-            ("Park Street", "Kolkata", "West Bengal", "India", "700016", now),
-            ("Rajarhat", "Kolkata", "West Bengal", "India", "700156", now),
-            # Jaipur
-            ("Vaishali Nagar", "Jaipur", "Rajasthan", "India", "302021", now),
-            ("C Scheme", "Jaipur", "Rajasthan", "India", "302001", now),
-            ("Malviya Nagar", "Jaipur", "Rajasthan", "India", "302017", now),
-            ("Adarsh Nagar", "Jaipur", "Rajasthan", "India", "302004", now),
-            ("Tonk Road", "Jaipur", "Rajasthan", "India", "302015", now),
-            # Indore
-            ("Vijay Nagar", "Indore", "Madhya Pradesh", "India", "452010", now),
-            ("Rajwada", "Indore", "Madhya Pradesh", "India", "452002", now),
-            ("Bhanwar Kuan", "Indore", "Madhya Pradesh", "India", "452001", now),
-            ("South Tukoganj", "Indore", "Madhya Pradesh", "India", "452002", now),
-            ("Khajrana", "Indore", "Madhya Pradesh", "India", "452008", now),
-            # Lucknow
-            ("Gomti Nagar", "Lucknow", "Uttar Pradesh", "India", "226010", now),
-            ("Hazratganj", "Lucknow", "Uttar Pradesh", "India", "226001", now),
-            ("Aliganj", "Lucknow", "Uttar Pradesh", "India", "226024", now),
-            ("Vikas Nagar", "Lucknow", "Uttar Pradesh", "India", "226022", now),
-            ("Mahanagar", "Lucknow", "Uttar Pradesh", "India", "226006", now),
+            # New York, NY
+            ("Manhattan", "New York", "NY", "USA", "10001", now),
+            ("Brooklyn", "New York", "NY", "USA", "11201", now),
+            ("Queens", "New York", "NY", "USA", "11354", now),
+            ("Bronx", "New York", "NY", "USA", "10451", now),
+            ("Staten Island", "New York", "NY", "USA", "10301", now),
+            # Los Angeles, CA
+            ("Downtown LA", "Los Angeles", "CA", "USA", "90012", now),
+            ("Hollywood", "Los Angeles", "CA", "USA", "90028", now),
+            ("Santa Monica", "Los Angeles", "CA", "USA", "90401", now),
+            ("Beverly Hills", "Los Angeles", "CA", "USA", "90210", now),
+            ("Pasadena", "Los Angeles", "CA", "USA", "91101", now),
+            # Chicago, IL
+            ("The Loop", "Chicago", "IL", "USA", "60601", now),
+            ("Lincoln Park", "Chicago", "IL", "USA", "60614", now),
+            ("Wicker Park", "Chicago", "IL", "USA", "60622", now),
+            ("River North", "Chicago", "IL", "USA", "60654", now),
+            ("Hyde Park", "Chicago", "IL", "USA", "60637", now),
+            # Houston, TX
+            ("Downtown Houston", "Houston", "TX", "USA", "77002", now),
+            ("Galleria", "Houston", "TX", "USA", "77056", now),
+            ("Midtown", "Houston", "TX", "USA", "77004", now),
+            ("The Heights", "Houston", "TX", "USA", "77008", now),
+            ("Memorial", "Houston", "TX", "USA", "77024", now),
+            # Phoenix, AZ
+            ("Downtown Phoenix", "Phoenix", "AZ", "USA", "85003", now),
+            ("Scottsdale", "Phoenix", "AZ", "USA", "85251", now),
+            ("Tempe", "Phoenix", "AZ", "USA", "85281", now),
+            ("Mesa", "Phoenix", "AZ", "USA", "85201", now),
+            ("Glendale", "Phoenix", "AZ", "USA", "85301", now),
+            # Philadelphia, PA
+            ("Center City", "Philadelphia", "PA", "USA", "19102", now),
+            ("Old City", "Philadelphia", "PA", "USA", "19106", now),
+            ("University City", "Philadelphia", "PA", "USA", "19104", now),
+            ("Rittenhouse Square", "Philadelphia", "PA", "USA", "19103", now),
+            ("Northern Liberties", "Philadelphia", "PA", "USA", "19123", now),
+            # San Antonio, TX
+            ("Downtown San Antonio", "San Antonio", "TX", "USA", "78205", now),
+            ("Alamo Heights", "San Antonio", "TX", "USA", "78209", now),
+            ("Stone Oak", "San Antonio", "TX", "USA", "78258", now),
+            ("Southtown", "San Antonio", "TX", "USA", "78204", now),
+            ("Medical Center", "San Antonio", "TX", "USA", "78229", now),
+            # San Diego, CA
+            ("Downtown San Diego", "San Diego", "CA", "USA", "92101", now),
+            ("La Jolla", "San Diego", "CA", "USA", "92037", now),
+            ("Pacific Beach", "San Diego", "CA", "USA", "92109", now),
+            ("Gaslamp Quarter", "San Diego", "CA", "USA", "92101", now),
+            ("Mission Valley", "San Diego", "CA", "USA", "92108", now),
+            # Dallas, TX
+            ("Downtown Dallas", "Dallas", "TX", "USA", "75201", now),
+            ("Uptown", "Dallas", "TX", "USA", "75204", now),
+            ("Deep Ellum", "Dallas", "TX", "USA", "75226", now),
+            ("Highland Park", "Dallas", "TX", "USA", "75205", now),
+            ("Bishop Arts District", "Dallas", "TX", "USA", "75208", now),
+            # San Jose, CA
+            ("Downtown San Jose", "San Jose", "CA", "USA", "95113", now),
+            ("Willow Glen", "San Jose", "CA", "USA", "95125", now),
+            ("Almaden Valley", "San Jose", "CA", "USA", "95120", now),
+            ("Santana Row", "San Jose", "CA", "USA", "95128", now),
+            ("Evergreen", "San Jose", "CA", "USA", "95148", now),
         ]
         
         locality_ids = []

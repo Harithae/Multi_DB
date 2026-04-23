@@ -7,6 +7,7 @@ from bson.decimal128 import Decimal128
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from pymongo import MongoClient
+import pyodbc
 from config.db_config import Config
 
 def now():
@@ -18,7 +19,33 @@ def get_db():
     print(f"Connected to MongoDB. Database: CustomerDB")
     return db
 
+def get_real_product_ids():
+    """Fetch actual Product_IDs and prices from SQL Server InventoryDB"""
+    conn_str = (
+        f"DRIVER={Config.SQLSERVER_DRIVER};"
+        f"SERVER={Config.SQLSERVER_SERVER};"
+        f"DATABASE=InventoryDB;"
+    )
+    if Config.SQLSERVER_TRUSTED.lower() == 'yes':
+        conn_str += "Trusted_Connection=yes;"
+    else:
+        conn_str += f"UID={Config.SQLSERVER_USER};PWD={Config.SQLSERVER_PASSWORD};"
+    conn_str += "TrustServerCertificate=yes;"
+    
+    conn = pyodbc.connect(conn_str)
+    cur = conn.cursor()
+    cur.execute("SELECT Product_ID, Product_Price FROM Product")
+    products = [(row[0], float(row[1])) for row in cur.fetchall()]
+    conn.close()
+    
+    return products
+
 def generate_bulk_data(count=100):
+    # Fetch real products from inventory
+    print("Fetching real Product_IDs from InventoryDB...")
+    real_products = get_real_product_ids()
+    print(f"Found {len(real_products)} products in inventory")
+    
     first_names = ["James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda", "David", "Elizabeth", 
                    "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica", "Thomas", "Sarah", "Charles", "Karen"]
     last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", 
@@ -79,13 +106,14 @@ def generate_bulk_data(count=100):
             })
             addr_id_seq += 1
             
-        # 3. View History (2-4 per customer)
+        # 3. View History (2-4 per customer) - use real products
         for _ in range(random.randint(2, 4)):
+            product_id, product_price = random.choice(real_products)
             histories.append({
                 "Customer_View_History_ID": view_id_seq,
                 "Customer_ID": cust_id,
-                "Product_ID": random.randint(100, 999),
-                "Product_Price": Decimal128(str(round(random.uniform(10.0, 500.0), 2))),
+                "Product_ID": product_id,
+                "Product_Price": Decimal128(str(product_price)),
                 "Created_Date": now() - timedelta(days=random.randint(1, 30)),
                 "Modified_Date": None
             })
@@ -101,13 +129,14 @@ def generate_bulk_data(count=100):
             "Modified_Date": None
         })
         
-        # 5. Wish List Items (1-3 per wishlist)
+        # 5. Wish List Items (1-3 per wishlist) - use real products
         for _ in range(random.randint(1, 3)):
+            product_id, product_price = random.choice(real_products)
             wishlist_items.append({
                 "Customer_Wish_List_Item_ID": item_id_seq,
                 "Customer_Wish_List_ID": wish_id,
-                "Product_ID": random.randint(100, 999),
-                "Product_Price": Decimal128(str(round(random.uniform(10.0, 500.0), 2))),
+                "Product_ID": product_id,
+                "Product_Price": Decimal128(str(product_price)),
                 "Created_Date": now(),
                 "Modified_Date": None
             })
