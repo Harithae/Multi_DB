@@ -5,17 +5,93 @@ from datetime import datetime, timezone, timedelta
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Realistic product names
-PRODUCT_NAMES = [
-    "Wireless Bluetooth Headphones", "USB-C Charging Cable", "Portable Power Bank", "Smartphone Case",
-    "Tempered Glass Screen Protector", "Wireless Mouse", "Mechanical Keyboard", "USB Hub 3.0",
-    "Laptop Stand", "Phone Ring Holder", "Screen Cleaner Kit", "Cable Organizer",
-    "Webcam HD", "Microphone USB", "Portable SSD 1TB", "HDMI Cable 2.1",
-    "Monitor Arm Stand", "Anti-Blue Light Glasses", "Desk Lamp LED", "USB Foot Pedal",
-    "Noise-Cancelling Earbuds", "Wireless Charging Pad", "External Hard Drive 2TB", "Car Phone Mount",
-    "Desk Organizer", "Keyboard Wrist Rest", "Monitor Light Bar", "Desk Pad Mat",
-    "USB Splitter Hub", "Phone Stand Dock", "Wire Manager Clips", "Magnetic Cable Holder"
-]
+# Category-specific product names for realistic and unique data
+CATEGORY_PRODUCTS = {
+    "Electronics & Gadgets": [
+        "Wireless Bluetooth Headphones", "USB-C Charging Cable", "Portable Power Bank", 
+        "Wireless Mouse", "Mechanical Keyboard", "USB Hub 3.0", "Bluetooth Speaker",
+        "Smart Watch", "Fitness Tracker", "Wireless Earbuds", "Phone Stand Dock",
+        "Digital Photo Frame", "Smart Home Hub", "Voice Assistant", "Wireless Charger"
+    ],
+    "Mobile Devices": [
+        "Smartphone Case", "Tempered Glass Screen Protector", "Car Phone Mount",
+        "Wireless Charging Pad", "Phone Ring Holder", "Mobile Game Controller",
+        "Selfie Stick Tripod", "Phone Camera Lens Kit", "Mobile Power Bank",
+        "Phone Wallet Case", "Magnetic Car Mount", "Phone Grip Stand", "Mobile Cooler Fan"
+    ],
+    "Computing": [
+        "Laptop Stand", "External Hard Drive 1TB", "Wireless Mouse Pad", 
+        "USB Webcam HD", "Laptop Cooling Pad", "External DVD Writer",
+        "USB Flash Drive 64GB", "Laptop Sleeve Bag", "Wireless Keyboard",
+        "Computer Monitor 24inch", "Laptop Docking Station", "PC Speakers", "Webcam Cover"
+    ],
+    "Camera Equipment": [
+        "DSLR Camera Bag", "Camera Tripod Stand", "Memory Card 128GB",
+        "Camera Lens Filter", "Flash Speedlight", "Camera Remote Shutter",
+        "Lens Cleaning Kit", "Camera Battery Grip", "Photo Studio Light",
+        "Camera Strap", "Lens Cap Keeper", "Camera Rain Cover", "Tripod Ball Head"
+    ],
+    "Gaming": [
+        "Gaming Mouse RGB", "Gaming Keyboard Mechanical", "Gaming Headset",
+        "Game Controller Wireless", "Gaming Mouse Pad XXL", "Gaming Chair",
+        "VR Headset", "Gaming Monitor 27inch", "Gaming Webcam",
+        "Gaming Microphone", "Controller Charging Station", "Gaming Desk", "RGB Light Strip"
+    ],
+    "Networking": [
+        "WiFi Router Dual Band", "Ethernet Cable Cat6", "Network Switch 8-Port",
+        "WiFi Range Extender", "Powerline Adapter", "Network Cable Tester",
+        "Wireless Access Point", "Modem Router Combo", "Network Storage NAS",
+        "Fiber Optic Cable", "Network Patch Panel", "WiFi Antenna", "Network Analyzer"
+    ],
+    "Storage Devices": [
+        "Portable SSD 1TB", "External Hard Drive 2TB", "USB Flash Drive 32GB",
+        "Memory Card MicroSD", "SSD Internal 500GB", "Hard Drive Enclosure",
+        "Cloud Storage Device", "Backup Drive External", "Memory Card Reader",
+        "NVMe SSD 1TB", "RAID Enclosure", "USB-C SSD", "Secure USB Drive"
+    ],
+    "Cable Management": [
+        "HDMI Cable 2.1", "USB Extension Cable", "Cable Organizer Box",
+        "Cable Clips Adhesive", "Cable Sleeve Wrap", "Power Strip Surge",
+        "Cable Ties Velcro", "Cord Management Tray", "Cable Grommet Desk",
+        "Wire Raceway", "Cable Spine", "Magnetic Cable Holder", "Under Desk Tray"
+    ],
+    "Screen Protection": [
+        "Screen Cleaner Kit", "Anti-Blue Light Glasses", "Monitor Privacy Filter",
+        "Screen Protector Film", "Display Cleaning Wipes", "Screen Guard Liquid",
+        "Monitor Stand Riser", "Screen Magnifier Lens", "Display Port Cable",
+        "Monitor Light Bar", "Screen Cleaning Cloth", "Privacy Screen 15inch", "Blue Light Filter"
+    ],
+    "USB Cables & Adapters": [
+        "USB-C to USB-A Cable", "Lightning to USB Cable", "USB Splitter Hub",
+        "USB-C Adapter Dongle", "Micro USB Cable", "USB Wall Charger",
+        "USB Car Charger", "USB Extension Hub", "USB-C Hub Multiport",
+        "USB-A to Ethernet", "USB Audio Adapter", "USB-C to HDMI", "Multi-Port USB Hub"
+    ],
+    "Wearables": [
+        "Smart Fitness Band", "Bluetooth Smart Watch", "Heart Rate Monitor",
+        "Sleep Tracker Device", "Smart Ring Fitness", "Activity Tracker Kids",
+        "GPS Running Watch", "Smart Health Scale", "Posture Tracker Device",
+        "Smart Glasses", "Fitness Chest Strap", "Smart Jewelry", "Wearable Camera"
+    ],
+    "Health & Fitness Trackers": [
+        "Blood Pressure Monitor", "Digital Thermometer", "Pulse Oximeter",
+        "Body Fat Scale", "Pedometer Step Counter", "Yoga Mat Smart",
+        "Resistance Bands Set", "Foam Roller Massage", "Exercise Ball Stability",
+        "Smart Water Bottle", "Meditation Headband", "Recovery Massage Gun", "Air Quality Monitor"
+    ],
+    "Accessories": [
+        "Desk Organizer", "Phone Holder Adjustable", "Tablet Stand Foldable",
+        "Laptop Riser Stand", "Monitor Arm Mount", "Keyboard Wrist Rest",
+        "Mouse Pad Ergonomic", "Cable Management Box", "Desk Lamp LED",
+        "Document Camera", "Presentation Remote", "Wireless Presenter", "Desk Fan USB"
+    ],
+    "Tech Fashion": [
+        "Smart Jewelry Ring", "LED Backpack", "Tech Gloves Touchscreen",
+        "Smart Clothing Shirt", "Heated Jacket USB", "LED Sneakers",
+        "Smart Glasses AR", "Wearable Camera Pin", "Tech Scarf Heated",
+        "Smart Belt", "LED Hat", "Heated Gloves", "Smart Socks"
+    ]
+}
 
 COLORS = ["Black", "White", "Silver", "Gold", "Blue", "Red", "Gray", "Rose Gold"]
 SIZES = ["XS", "S", "M", "L", "XL", "XXL", "One Size", "Free Size"]
@@ -191,17 +267,95 @@ def bulk_insert_inventory(count=1000):
             cur.execute("INSERT INTO Store (Location_ID, Store_Name, Store_Address, Store_Owner_Name, Store_Owner_Phone, Store_Owner_Email, Created_Date) OUTPUT INSERTED.Store_ID VALUES (?,?,?,?,?,?,?)", store_data)
             store_ids.append(cur.fetchone()[0])
 
-        # 5. Insert Products (1000)
+        # 5. Insert Products (200) - Category-specific products for uniqueness
         print(f"Inserting {count} products...")
         product_ids = []
-        for i in range(1, count + 1):
-            cat_id = random.choice(category_ids)
-            product_name = random.choice(PRODUCT_NAMES)
-            # Generate realistic price between ₹199 and ₹15,999
-            product_price = round(random.uniform(199.00, 15999.00), 2)
-            prod_data = (product_name, product_price, f"High-quality {product_name.lower()} with excellent features and durability. Perfect for both professional and personal use.", cat_id, now)
-            cur.execute("INSERT INTO Product (Product_Name, Product_Price, Product_Description, Product_Category_ID, Created_Date) OUTPUT INSERTED.Product_ID VALUES (?,?,?,?,?)", prod_data)
-            product_ids.append(cur.fetchone()[0])
+        
+        # Get category names to map with CATEGORY_PRODUCTS
+        cur.execute("SELECT Product_Category_ID, Product_Category_Name FROM Product_Category")
+        categories = cur.fetchall()
+        
+        # Calculate products per category (evenly distributed)
+        products_per_category = count // len(categories)
+        remaining_products = count % len(categories)
+        
+        # Track used products globally to ensure no duplicates across categories
+        used_products_globally = set()
+        
+        for i, (category_id, category_name) in enumerate(categories):
+            # Determine how many products for this category
+            products_for_this_cat = products_per_category
+            if i < remaining_products:  # Distribute remainder
+                products_for_this_cat += 1
+            
+            # Get category-specific product list, with fallbacks
+            available_products = []
+            
+            # Try exact match first
+            if category_name in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS[category_name].copy()
+            # Try partial matches for similar categories
+            elif "Tech Fashion" in category_name and "Tech Fashion" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Tech Fashion"].copy()
+            elif "Gaming" in category_name and "Gaming" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Gaming"].copy()
+            elif "Mobile" in category_name and "Mobile Devices" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Mobile Devices"].copy()
+            elif "Computing" in category_name and "Computing" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Computing"].copy()
+            elif "Audio" in category_name and "Electronics & Gadgets" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Electronics & Gadgets"].copy()
+            elif "Wearables" in category_name and "Wearables" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Wearables"].copy()
+            elif "Health" in category_name and "Health & Fitness Trackers" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Health & Fitness Trackers"].copy()
+            elif "Camera" in category_name and "Camera Equipment" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Camera Equipment"].copy()
+            elif "USB" in category_name and "USB Cables & Adapters" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["USB Cables & Adapters"].copy()
+            elif "Screen" in category_name and "Screen Protection" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Screen Protection"].copy()
+            elif "Cable" in category_name and "Cable Management" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Cable Management"].copy()
+            elif "Storage" in category_name and "Storage Devices" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Storage Devices"].copy()
+            elif "Networking" in category_name and "Networking" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Networking"].copy()
+            elif "Accessories" in category_name and "Accessories" in CATEGORY_PRODUCTS:
+                available_products = CATEGORY_PRODUCTS["Accessories"].copy()
+            else:
+                # Fallback to Electronics & Gadgets
+                available_products = CATEGORY_PRODUCTS["Electronics & Gadgets"].copy()
+            
+            # Remove products that have been used globally
+            available_products = [p for p in available_products if p not in used_products_globally]
+            
+            # Generate products for this category
+            for j in range(products_for_this_cat):
+                if available_products:
+                    # Use unique product from category list
+                    product_name = available_products.pop(0)
+                else:
+                    # If we run out, create unique variants
+                    base_name = f"Product {category_name.split()[0]}"
+                    variant = random.choice(["Pro", "Plus", "Max", "Elite", "Premium", "Advanced", "Deluxe", "Ultra"])
+                    product_name = f"{base_name} {variant} {j+1}"
+                
+                # Ensure global uniqueness
+                original_name = product_name
+                counter = 1
+                while product_name in used_products_globally:
+                    product_name = f"{original_name} V{counter}"
+                    counter += 1
+                
+                # Mark as used globally
+                used_products_globally.add(product_name)
+                
+                # Generate realistic price between $199 and $15,999
+                product_price = round(random.uniform(199.00, 15999.00), 2)
+                prod_data = (product_name, product_price, f"High-quality {product_name.lower()} with excellent features and durability. Perfect for both professional and personal use.", category_id, now)
+                cur.execute("INSERT INTO Product (Product_Name, Product_Price, Product_Description, Product_Category_ID, Created_Date) OUTPUT INSERTED.Product_ID VALUES (?,?,?,?,?)", prod_data)
+                product_ids.append(cur.fetchone()[0])
 
         # 6. Insert Features (3 per product)
         print("Inserting features...")
@@ -253,4 +407,4 @@ def bulk_insert_inventory(count=1000):
         conn.close()
 
 if __name__ == "__main__":
-    bulk_insert_inventory(1000)
+    bulk_insert_inventory(200)  # Changed from 1000 to 200
