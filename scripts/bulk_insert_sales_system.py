@@ -102,7 +102,7 @@ def bulk_insert_sales():
         
         num_orders = random.randint(5, 10)
         for _ in range(num_orders):
-            order_date = now_utc - timedelta(days=random.randint(1, 60))
+            order_date = now_utc - timedelta(days=random.randint(1, 180))
             aid = random.choice(addr_ids)
             
             # Temporary state to calculate amount and select valid store-products
@@ -165,7 +165,7 @@ def bulk_insert_sales():
     conn.close()
     print("\n[SUCCESS] Bulk insertion of Sales system (PostgreSQL) completed!")
     print(f"  Processed ~{len(customers) * 7.5:.0f} orders with valid products from Store_Products inventory.")
-    print(f"  Product-Store mapping available via Product_ID in Order_Items → Store_Products in SQL Server.")
+    print(f"  Product-Store mapping available via Product_ID in Order_Items -> Store_Products in SQL Server.")
 
 if __name__ == "__main__":
     bulk_insert_sales()

@@ -115,45 +115,59 @@ def get_conn():
     conn_str += "TrustServerCertificate=yes;Connection Timeout=60;"
     return pyodbc.connect(conn_str, autocommit=False)
 
+def get_random_date(months=6):
+    """Generate a random date within the last n months."""
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=months * 30)
+    time_between = end_date - start_date
+    random_days = random.randrange(time_between.days)
+    random_seconds = random.randrange(86400)
+    return start_date + timedelta(days=random_days, seconds=random_seconds)
+
 def bulk_insert_inventory(count=1000):
     conn = get_conn()
     cur = conn.cursor()
-    now = datetime.now()
-
+    cur.fast_executemany = True
+    
     print(f"Starting bulk insertion of {count} products into InventoryDB...")
 
     try:
         # 1. Clean up existing data first (Reverse FK order)
-        print("Cleaning up old data...")
+        print("Cleaning up old data (simulating TRUNCATE)...")
         tables = ["Store_Products", "Store", "Locality", "Product_Features", "Product_Image", "Product", "Product_Category"]
         for t in tables:
             cur.execute(f"DELETE FROM {t}")
+            try:
+                # Reset identity column to simulate TRUNCATE behavior
+                cur.execute(f"DBCC CHECKIDENT ('{t}', RESEED, 0)")
+            except Exception:
+                pass
         conn.commit()
-        print("Old data cleaned.")
+        print("Old data truncated.")
 
         # 2. Insert Categories (Real Product Categories)
         print("Inserting product categories...")
         category_data = [
-            ("Electronics & Gadgets", "Unisex", 15, 65, now),
-            ("Accessories", "Unisex", 10, 70, now),
-            ("Mobile Devices", "Unisex", 12, 60, now),
-            ("Computing", "Unisex", 18, 65, now),
-            ("Audio Equipment", "Unisex", 14, 60, now),
-            ("Gaming", "Unisex", 8, 50, now),
-            ("Smart Home", "Unisex", 20, 65, now),
-            ("Wearables", "Unisex", 15, 60, now),
-            ("Networking", "Unisex", 20, 65, now),
-            ("Storage Devices", "Unisex", 16, 65, now),
-            ("Office Supplies", "Unisex", 18, 70, now),
-            ("Tech Fashion", "Female", 16, 50, now),
-            ("Tech Fashion", "Male", 16, 50, now),
-            ("Health & Fitness Trackers", "Unisex", 18, 55, now),
-            ("Camera Equipment", "Unisex", 20, 65, now),
-            ("USB Cables & Adapters", "Unisex", 12, 70, now),
-            ("Screen Protection", "Unisex", 14, 65, now),
-            ("Charging Solutions", "Unisex", 15, 70, now),
-            ("Desk Accessories", "Unisex", 18, 65, now),
-            ("Cable Management", "Unisex", 18, 70, now),
+            ("Electronics & Gadgets", "Unisex", 15, 65, get_random_date()),
+            ("Accessories", "Unisex", 10, 70, get_random_date()),
+            ("Mobile Devices", "Unisex", 12, 60, get_random_date()),
+            ("Computing", "Unisex", 18, 65, get_random_date()),
+            ("Audio Equipment", "Unisex", 14, 60, get_random_date()),
+            ("Gaming", "Unisex", 8, 50, get_random_date()),
+            ("Smart Home", "Unisex", 20, 65, get_random_date()),
+            ("Wearables", "Unisex", 15, 60, get_random_date()),
+            ("Networking", "Unisex", 20, 65, get_random_date()),
+            ("Storage Devices", "Unisex", 16, 65, get_random_date()),
+            ("Office Supplies", "Unisex", 18, 70, get_random_date()),
+            ("Tech Fashion", "Female", 16, 50, get_random_date()),
+            ("Tech Fashion", "Male", 16, 50, get_random_date()),
+            ("Health & Fitness Trackers", "Unisex", 18, 55, get_random_date()),
+            ("Camera Equipment", "Unisex", 20, 65, get_random_date()),
+            ("USB Cables & Adapters", "Unisex", 12, 70, get_random_date()),
+            ("Screen Protection", "Unisex", 14, 65, get_random_date()),
+            ("Charging Solutions", "Unisex", 15, 70, get_random_date()),
+            ("Desk Accessories", "Unisex", 18, 65, get_random_date()),
+            ("Cable Management", "Unisex", 18, 70, get_random_date()),
         ]
         
         category_ids = []
@@ -165,65 +179,65 @@ def bulk_insert_inventory(count=1000):
         print("Inserting localities...")
         localities_data = [
             # New York, NY
-            ("Manhattan", "New York", "NY", "USA", "10001", now),
-            ("Brooklyn", "New York", "NY", "USA", "11201", now),
-            ("Queens", "New York", "NY", "USA", "11354", now),
-            ("Bronx", "New York", "NY", "USA", "10451", now),
-            ("Staten Island", "New York", "NY", "USA", "10301", now),
+            ("Manhattan", "New York", "NY", "USA", "10001", get_random_date()),
+            ("Brooklyn", "New York", "NY", "USA", "11201", get_random_date()),
+            ("Queens", "New York", "NY", "USA", "11354", get_random_date()),
+            ("Bronx", "New York", "NY", "USA", "10451", get_random_date()),
+            ("Staten Island", "New York", "NY", "USA", "10301", get_random_date()),
             # Los Angeles, CA
-            ("Downtown LA", "Los Angeles", "CA", "USA", "90012", now),
-            ("Hollywood", "Los Angeles", "CA", "USA", "90028", now),
-            ("Santa Monica", "Los Angeles", "CA", "USA", "90401", now),
-            ("Beverly Hills", "Los Angeles", "CA", "USA", "90210", now),
-            ("Pasadena", "Los Angeles", "CA", "USA", "91101", now),
+            ("Downtown LA", "Los Angeles", "CA", "USA", "90012", get_random_date()),
+            ("Hollywood", "Los Angeles", "CA", "USA", "90028", get_random_date()),
+            ("Santa Monica", "Los Angeles", "CA", "USA", "90401", get_random_date()),
+            ("Beverly Hills", "Los Angeles", "CA", "USA", "90210", get_random_date()),
+            ("Pasadena", "Los Angeles", "CA", "USA", "91101", get_random_date()),
             # Chicago, IL
-            ("The Loop", "Chicago", "IL", "USA", "60601", now),
-            ("Lincoln Park", "Chicago", "IL", "USA", "60614", now),
-            ("Wicker Park", "Chicago", "IL", "USA", "60622", now),
-            ("River North", "Chicago", "IL", "USA", "60654", now),
-            ("Hyde Park", "Chicago", "IL", "USA", "60637", now),
+            ("The Loop", "Chicago", "IL", "USA", "60601", get_random_date()),
+            ("Lincoln Park", "Chicago", "IL", "USA", "60614", get_random_date()),
+            ("Wicker Park", "Chicago", "IL", "USA", "60622", get_random_date()),
+            ("River North", "Chicago", "IL", "USA", "60654", get_random_date()),
+            ("Hyde Park", "Chicago", "IL", "USA", "60637", get_random_date()),
             # Houston, TX
-            ("Downtown Houston", "Houston", "TX", "USA", "77002", now),
-            ("Galleria", "Houston", "TX", "USA", "77056", now),
-            ("Midtown", "Houston", "TX", "USA", "77004", now),
-            ("The Heights", "Houston", "TX", "USA", "77008", now),
-            ("Memorial", "Houston", "TX", "USA", "77024", now),
+            ("Downtown Houston", "Houston", "TX", "USA", "77002", get_random_date()),
+            ("Galleria", "Houston", "TX", "USA", "77056", get_random_date()),
+            ("Midtown", "Houston", "TX", "USA", "77004", get_random_date()),
+            ("The Heights", "Houston", "TX", "USA", "77008", get_random_date()),
+            ("Memorial", "Houston", "TX", "USA", "77024", get_random_date()),
             # Phoenix, AZ
-            ("Downtown Phoenix", "Phoenix", "AZ", "USA", "85003", now),
-            ("Scottsdale", "Phoenix", "AZ", "USA", "85251", now),
-            ("Tempe", "Phoenix", "AZ", "USA", "85281", now),
-            ("Mesa", "Phoenix", "AZ", "USA", "85201", now),
-            ("Glendale", "Phoenix", "AZ", "USA", "85301", now),
+            ("Downtown Phoenix", "Phoenix", "AZ", "USA", "85003", get_random_date()),
+            ("Scottsdale", "Phoenix", "AZ", "USA", "85251", get_random_date()),
+            ("Tempe", "Phoenix", "AZ", "USA", "85281", get_random_date()),
+            ("Mesa", "Phoenix", "AZ", "USA", "85201", get_random_date()),
+            ("Glendale", "Phoenix", "AZ", "USA", "85301", get_random_date()),
             # Philadelphia, PA
-            ("Center City", "Philadelphia", "PA", "USA", "19102", now),
-            ("Old City", "Philadelphia", "PA", "USA", "19106", now),
-            ("University City", "Philadelphia", "PA", "USA", "19104", now),
-            ("Rittenhouse Square", "Philadelphia", "PA", "USA", "19103", now),
-            ("Northern Liberties", "Philadelphia", "PA", "USA", "19123", now),
+            ("Center City", "Philadelphia", "PA", "USA", "19102", get_random_date()),
+            ("Old City", "Philadelphia", "PA", "USA", "19106", get_random_date()),
+            ("University City", "Philadelphia", "PA", "USA", "19104", get_random_date()),
+            ("Rittenhouse Square", "Philadelphia", "PA", "USA", "19103", get_random_date()),
+            ("Northern Liberties", "Philadelphia", "PA", "USA", "19123", get_random_date()),
             # San Antonio, TX
-            ("Downtown San Antonio", "San Antonio", "TX", "USA", "78205", now),
-            ("Alamo Heights", "San Antonio", "TX", "USA", "78209", now),
-            ("Stone Oak", "San Antonio", "TX", "USA", "78258", now),
-            ("Southtown", "San Antonio", "TX", "USA", "78204", now),
-            ("Medical Center", "San Antonio", "TX", "USA", "78229", now),
+            ("Downtown San Antonio", "San Antonio", "TX", "USA", "78205", get_random_date()),
+            ("Alamo Heights", "San Antonio", "TX", "USA", "78209", get_random_date()),
+            ("Stone Oak", "San Antonio", "TX", "USA", "78258", get_random_date()),
+            ("Southtown", "San Antonio", "TX", "USA", "78204", get_random_date()),
+            ("Medical Center", "San Antonio", "TX", "USA", "78229", get_random_date()),
             # San Diego, CA
-            ("Downtown San Diego", "San Diego", "CA", "USA", "92101", now),
-            ("La Jolla", "San Diego", "CA", "USA", "92037", now),
-            ("Pacific Beach", "San Diego", "CA", "USA", "92109", now),
-            ("Gaslamp Quarter", "San Diego", "CA", "USA", "92101", now),
-            ("Mission Valley", "San Diego", "CA", "USA", "92108", now),
+            ("Downtown San Diego", "San Diego", "CA", "USA", "92101", get_random_date()),
+            ("La Jolla", "San Diego", "CA", "USA", "92037", get_random_date()),
+            ("Pacific Beach", "San Diego", "CA", "USA", "92109", get_random_date()),
+            ("Gaslamp Quarter", "San Diego", "CA", "USA", "92101", get_random_date()),
+            ("Mission Valley", "San Diego", "CA", "USA", "92108", get_random_date()),
             # Dallas, TX
-            ("Downtown Dallas", "Dallas", "TX", "USA", "75201", now),
-            ("Uptown", "Dallas", "TX", "USA", "75204", now),
-            ("Deep Ellum", "Dallas", "TX", "USA", "75226", now),
-            ("Highland Park", "Dallas", "TX", "USA", "75205", now),
-            ("Bishop Arts District", "Dallas", "TX", "USA", "75208", now),
+            ("Downtown Dallas", "Dallas", "TX", "USA", "75201", get_random_date()),
+            ("Uptown", "Dallas", "TX", "USA", "75204", get_random_date()),
+            ("Deep Ellum", "Dallas", "TX", "USA", "75226", get_random_date()),
+            ("Highland Park", "Dallas", "TX", "USA", "75205", get_random_date()),
+            ("Bishop Arts District", "Dallas", "TX", "USA", "75208", get_random_date()),
             # San Jose, CA
-            ("Downtown San Jose", "San Jose", "CA", "USA", "95113", now),
-            ("Willow Glen", "San Jose", "CA", "USA", "95125", now),
-            ("Almaden Valley", "San Jose", "CA", "USA", "95120", now),
-            ("Santana Row", "San Jose", "CA", "USA", "95128", now),
-            ("Evergreen", "San Jose", "CA", "USA", "95148", now),
+            ("Downtown San Jose", "San Jose", "CA", "USA", "95113", get_random_date()),
+            ("Willow Glen", "San Jose", "CA", "USA", "95125", get_random_date()),
+            ("Almaden Valley", "San Jose", "CA", "USA", "95120", get_random_date()),
+            ("Santana Row", "San Jose", "CA", "USA", "95128", get_random_date()),
+            ("Evergreen", "San Jose", "CA", "USA", "95148", get_random_date()),
         ]
         
         locality_ids = []
@@ -245,13 +259,13 @@ def bulk_insert_inventory(count=1000):
         ]
         
         owner_names = [
-            "Rajesh Kumar", "Priya Singh", "Vikram Patel", "Neha Sharma", "Arjun Desai",
-            "Anjali Nair", "Rohit Verma", "Divya Iyer", "Arun Rao", "Meera Reddy",
-            "Suresh Kumar", "Shreya Das", "Akshay Gupta", "Pooja Malik", "Nitin Jain",
-            "Ananya Chopra", "Harish Reddy", "Kavya Krishnan", "Manish Saxena", "Ritu Pandey",
-            "Sanjay Singh", "Deepika Roy", "Rajeev Nair", "Shalini Menon", "Vishal Kapoor",
-            "Ritika Sharma", "Aditya Bhatt", "Priyanka Khurana", "Naveen Kumar", "Sneha Verma",
-            "Aman Srivastava", "Disha Yadav", "Sameer Khan", "Hina Patel", "Karan Mahajan",
+            "James Smith", "Mary Johnson", "Robert Williams", "Patricia Brown", "John Jones",
+            "Jennifer Garcia", "Michael Miller", "Linda Davis", "David Rodriguez", "Elizabeth Martinez",
+            "William Hernandez", "Barbara Lopez", "Richard Gonzalez", "Susan Wilson", "Joseph Anderson",
+            "Jessica Thomas", "Thomas Taylor", "Sarah Moore", "Charles Jackson", "Karen Martin",
+            "Christopher Lee", "Nancy Perez", "Matthew Thompson", "Lisa White", "Daniel Harris",
+            "Betty Sanchez", "Paul Clark", "Margaret Ramirez", "Mark Lewis", "Sandra Robinson",
+            "Donald Walker", "Ashley Young", "George Allen", "Dorothy King", "Kenneth Wright"
         ]
         
         store_ids = []
@@ -259,11 +273,11 @@ def bulk_insert_inventory(count=1000):
             loc_id = random.choice(locality_ids)
             store_name = random.choice(store_names)
             owner_name = random.choice(owner_names)
-            phone = f"+91-{random.randint(70,99)}{random.randint(1000,9999)}{random.randint(100000,999999)}"
+            phone = f"+1-{random.randint(200, 999)}-{random.randint(100, 999)}-{random.randint(1000, 9999)}"
             email = f"{store_name.lower().replace(' ', '')}{i}@techretail.com"
             address = f"{random.randint(100, 999)} {random.choice(['High Street', 'Main Road', 'Market Lane', 'Shopping Complex', 'Business Centre'])}, {['Unit A', 'Block B', 'Suite C', 'Floor 1', 'Level 2'][i % 5]}"
             
-            store_data = (loc_id, store_name, address, owner_name, phone, email, now)
+            store_data = (loc_id, store_name, address, owner_name, phone, email, get_random_date())
             cur.execute("INSERT INTO Store (Location_ID, Store_Name, Store_Address, Store_Owner_Name, Store_Owner_Phone, Store_Owner_Email, Created_Date) OUTPUT INSERTED.Store_ID VALUES (?,?,?,?,?,?,?)", store_data)
             store_ids.append(cur.fetchone()[0])
 
@@ -353,7 +367,7 @@ def bulk_insert_inventory(count=1000):
                 
                 # Generate realistic price between $199 and $15,999
                 product_price = round(random.uniform(199.00, 15999.00), 2)
-                prod_data = (product_name, product_price, f"High-quality {product_name.lower()} with excellent features and durability. Perfect for both professional and personal use.", category_id, now)
+                prod_data = (product_name, product_price, f"High-quality {product_name.lower()} with excellent features and durability. Perfect for both professional and personal use.", category_id, get_random_date())
                 cur.execute("INSERT INTO Product (Product_Name, Product_Price, Product_Description, Product_Category_ID, Created_Date) OUTPUT INSERTED.Product_ID VALUES (?,?,?,?,?)", prod_data)
                 product_ids.append(cur.fetchone()[0])
 
@@ -363,21 +377,21 @@ def bulk_insert_inventory(count=1000):
         for p_id in product_ids:
             # Color feature
             color_val = random.choice(COLORS)
-            feature_data.append((p_id, "Color", color_val, now))
+            feature_data.append((p_id, "Color", color_val, get_random_date()))
             
             # Size feature
             size_val = random.choice(SIZES)
-            feature_data.append((p_id, "Size", size_val, now))
+            feature_data.append((p_id, "Size", size_val, get_random_date()))
             
             # Weight feature
             weight_val = random.choice(WEIGHTS)
-            feature_data.append((p_id, "Weight", weight_val, now))
+            feature_data.append((p_id, "Weight", weight_val, get_random_date()))
         
         cur.executemany("INSERT INTO Product_Features (Product_ID, Product_Feature_Name, Product_Feature_Value, Created_Date) VALUES (?,?,?,?)", feature_data)
 
         # 7. Insert Images (1 per product)
         print("Inserting image placeholders...")
-        image_data = [(p_id, None, now) for p_id in product_ids]
+        image_data = [(p_id, None, get_random_date()) for p_id in product_ids]
         cur.executemany("INSERT INTO Product_Image (Product_ID, Product_Image, Created_Date) VALUES (?,?,?)", image_data)
 
         # 8. Insert Store_Products (Stock for 50% of product-store combinations randomly, capped at 10k)
@@ -387,7 +401,7 @@ def bulk_insert_inventory(count=1000):
         for p_id in product_ids:
             target_stores = random.sample(store_ids, random.randint(5, 15))
             for s_id in target_stores:
-                stock_data.append((s_id, p_id, random.randint(0, 500), now))
+                stock_data.append((s_id, p_id, random.randint(0, 500), get_random_date()))
         
         # Batch insert to avoid pyodbc character limit issues with massive queries
         batch_size = 1000
@@ -395,14 +409,14 @@ def bulk_insert_inventory(count=1000):
             cur.executemany("INSERT INTO Store_Products (Store_ID, Product_ID, Stock_Quantity, Created_Date) VALUES (?,?,?,?)", stock_data[i:i+batch_size])
 
         conn.commit()
-        print("\n[SUCCESS] Bulk insertion of Inventory system completed!")
+        print("\\n[SUCCESS] Bulk insertion of Inventory system completed!")
         print(f"  - Products: {len(product_ids)}")
         print(f"  - Stores: {len(store_ids)}")
         print(f"  - Stock Records: {len(stock_data)}")
 
     except Exception as e:
         conn.rollback()
-        print(f"\n[ERROR] Bulk insertion failed: {e}")
+        print(f"\\n[ERROR] Bulk insertion failed: {e}")
     finally:
         conn.close()
 

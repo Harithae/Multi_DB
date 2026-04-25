@@ -10,8 +10,14 @@ from pymongo import MongoClient
 import pyodbc
 from config.db_config import Config
 
-def now():
-    return datetime.now(timezone.utc)
+def now(months=6):
+    """Generate a random date within the last n months."""
+    end_date = datetime.now(timezone.utc)
+    start_date = end_date - timedelta(days=months * 30)
+    time_between = end_date - start_date
+    random_days = random.randrange(time_between.days)
+    random_seconds = random.randrange(86400)
+    return start_date + timedelta(days=random_days, seconds=random_seconds)
 
 def get_db():
     client = MongoClient(Config.MONGODB_URI)
@@ -114,7 +120,7 @@ def generate_bulk_data(count=100):
                 "Customer_ID": cust_id,
                 "Product_ID": product_id,
                 "Product_Price": Decimal128(str(product_price)),
-                "Created_Date": now() - timedelta(days=random.randint(1, 30)),
+                "Created_Date": now(6), # Random date within last 6 months
                 "Modified_Date": None
             })
             view_id_seq += 1
@@ -152,10 +158,10 @@ def bulk_insert():
     
     # Clear existing data first to ensure clean IDs
     cols = ["Customer", "Customer_Address", "Customer_View_History", "Customer_Wish_List", "Customer_Wish_List_Item"]
-    print("\nPre-cleaning collections...")
+    print("\nPre-cleaning collections (Truncating)...")
     for col in cols:
-        db[col].delete_many({})
-        print(f"Cleaned {col}")
+        db[col].drop()
+        print(f"Truncated {col}")
 
     # Insert data
     print("\nInserting data...")
