@@ -238,6 +238,46 @@ def bulk_insert_inventory(count=1000):
             ("Almaden Valley", "San Jose", "CA", "USA", "95120", get_random_date()),
             ("Santana Row", "San Jose", "CA", "USA", "95128", get_random_date()),
             ("Evergreen", "San Jose", "CA", "USA", "95148", get_random_date()),
+            # Newark, NJ (Adjacent city)
+            ("Downtown Newark", "Newark", "NJ", "USA", "07102", get_random_date()),
+            ("Ironbound", "Newark", "NJ", "USA", "07105", get_random_date()),
+            ("University Heights", "Newark", "NJ", "USA", "07103", get_random_date()),
+            # Long Beach, CA (Adjacent city)
+            ("Downtown Long Beach", "Long Beach", "CA", "USA", "90802", get_random_date()),
+            ("Belmont Shore", "Long Beach", "CA", "USA", "90803", get_random_date()),
+            ("Naples", "Long Beach", "CA", "USA", "90803", get_random_date()),
+            # Evanston, IL (Adjacent city)
+            ("Downtown Evanston", "Evanston", "IL", "USA", "60201", get_random_date()),
+            ("Central Evanston", "Evanston", "IL", "USA", "60202", get_random_date()),
+            ("South Evanston", "Evanston", "IL", "USA", "60202", get_random_date()),
+            # The Woodlands, TX (Adjacent city)
+            ("Town Center", "The Woodlands", "TX", "USA", "77380", get_random_date()),
+            ("Sterling Ridge", "The Woodlands", "TX", "USA", "77382", get_random_date()),
+            ("Panther Creek", "The Woodlands", "TX", "USA", "77381", get_random_date()),
+            # Chandler, AZ (Adjacent city)
+            ("Downtown Chandler", "Chandler", "AZ", "USA", "85225", get_random_date()),
+            ("Ocotillo", "Chandler", "AZ", "USA", "85248", get_random_date()),
+            ("Sun Lakes", "Chandler", "AZ", "USA", "85248", get_random_date()),
+            # Camden, NJ (Adjacent city)
+            ("Downtown Camden", "Camden", "NJ", "USA", "08101", get_random_date()),
+            ("Waterfront", "Camden", "NJ", "USA", "08103", get_random_date()),
+            ("Cooper Grant", "Camden", "NJ", "USA", "08102", get_random_date()),
+            # New Braunfels, TX (Adjacent city)
+            ("Downtown New Braunfels", "New Braunfels", "TX", "USA", "78130", get_random_date()),
+            ("Gruene", "New Braunfels", "TX", "USA", "78130", get_random_date()),
+            ("Westpointe", "New Braunfels", "TX", "USA", "78132", get_random_date()),
+            # Chula Vista, CA (Adjacent city)
+            ("Downtown Chula Vista", "Chula Vista", "CA", "USA", "91910", get_random_date()),
+            ("Eastlake", "Chula Vista", "CA", "USA", "91915", get_random_date()),
+            ("Otay Ranch", "Chula Vista", "CA", "USA", "91913", get_random_date()),
+            # Arlington, TX (Adjacent city)
+            ("Downtown Arlington", "Arlington", "TX", "USA", "76010", get_random_date()),
+            ("Entertainment District", "Arlington", "TX", "USA", "76011", get_random_date()),
+            ("South Arlington", "Arlington", "TX", "USA", "76013", get_random_date()),
+            # Sunnyvale, CA (Adjacent city)
+            ("Downtown Sunnyvale", "Sunnyvale", "CA", "USA", "94086", get_random_date()),
+            ("Heritage District", "Sunnyvale", "CA", "USA", "94087", get_random_date()),
+            ("Lakewood", "Sunnyvale", "CA", "USA", "94089", get_random_date()),
         ]
         
         locality_ids = []

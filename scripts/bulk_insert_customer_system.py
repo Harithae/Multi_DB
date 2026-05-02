@@ -56,8 +56,14 @@ def generate_bulk_data(count=100):
                    "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica", "Thomas", "Sarah", "Charles", "Karen"]
     last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", 
                   "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"]
-    cities = [("New York", "NY"), ("Los Angeles", "CA"), ("Chicago", "IL"), ("Houston", "TX"), ("Phoenix", "AZ"), 
-              ("Philadelphia", "PA"), ("San Antonio", "TX"), ("San Diego", "CA"), ("Dallas", "TX"), ("San Jose", "CA")]
+    cities = [
+        # Original 10 cities
+        ("New York", "NY"), ("Los Angeles", "CA"), ("Chicago", "IL"), ("Houston", "TX"), ("Phoenix", "AZ"), 
+        ("Philadelphia", "PA"), ("San Antonio", "TX"), ("San Diego", "CA"), ("Dallas", "TX"), ("San Jose", "CA"),
+        # Adjacent 10 cities
+        ("Newark", "NJ"), ("Long Beach", "CA"), ("Evanston", "IL"), ("The Woodlands", "TX"), ("Chandler", "AZ"),
+        ("Camden", "NJ"), ("New Braunfels", "TX"), ("Chula Vista", "CA"), ("Arlington", "TX"), ("Sunnyvale", "CA")
+    ]
     genders = ["Male", "Female", "Other"]
     
     customers = []
@@ -154,7 +160,7 @@ def bulk_insert():
     db = get_db()
     
     # Generate data
-    customers, addresses, histories, wishlists, wishlist_items = generate_bulk_data(100)
+    customers, addresses, histories, wishlists, wishlist_items = generate_bulk_data(110)
     
     # Clear existing data first to ensure clean IDs
     cols = ["Customer", "Customer_Address", "Customer_View_History", "Customer_Wish_List", "Customer_Wish_List_Item"]
